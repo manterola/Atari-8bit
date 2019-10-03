@@ -305,6 +305,9 @@ int fprn; /* For printer output */
 char *fnamep;
 int printemu=0;
 
+int frhand; 
+char *fnameh;
+int rhand=0;
 
 
 /*
@@ -331,6 +334,7 @@ int main(int argc,char *argv[])
 	"  -b     next parameter is blank single-density image to create\n" \
 	"  -B     next parameter is blank double-density image to create\n" \
 	"  -p     next parameter is an printer raw output file (printer emulation)\n" \
+	"  -h     next parameter is a file containing the R: handler\n" \
 	"  -x     skip next drive image\n" \
 	"  -n     no ring detect on serial port (some USB converters)\n" \
 	"  <file> disk image to mount as next disk (D1 through D8 in order)\n" \
@@ -398,6 +402,15 @@ int main(int argc,char *argv[])
 				printemu=1;
 				fnamep = argv[i];
 				break;
+			    case 'h':
+			    ++i;
+				if ( i==argc ) {
+					fprintf(stderr, "Must have a parameter for '-h'\n" );
+					exit(1);
+				}
+				rhand=1;
+				fnameh = argv[i];
+				break;
 			    case 's':
 				++i;
 				if ( i==argc ) {
@@ -426,6 +439,14 @@ int main(int argc,char *argv[])
 	if (fprn<0) {
 		fprintf(stderr,"Can't open %s\n",fnamep);
 		exit(1);
+	}
+/*open file for reading R: handler*/
+	if (rhand>0) {
+		frhand=open(fnameh, O_RDONLY);
+		if (frhand<0) {
+			fprintf(stderr,"Can't open %s\n",fnameh);
+			exit(1);
+		}
 	}
 
 	/*
